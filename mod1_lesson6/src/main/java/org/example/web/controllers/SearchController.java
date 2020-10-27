@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/search")
@@ -28,13 +31,14 @@ public class SearchController {
     @PostMapping
     public String searchBooks(@RequestParam(value = "author") String author,
                               @RequestParam(value = "title") String title,
-                              @RequestParam(value = "size") Integer size, Model model,
-                              @ModelAttribute("AO") String AO){
-        logger.info(AO);
+                              @RequestParam(value = "size") Integer size,
+                              @RequestParam(value = "useAnd", required = false) boolean useAnd,
+                              Model model){
+        logger.info(useAnd);
         if (StringUtils.isEmpty(author) && StringUtils.isEmpty(title) && null == size){
             return "redirect:/search";
         }
-        model.addAttribute("bookList", bookService.getBooksBySearchQuery(author, title, size, AO));
+        model.addAttribute("bookList", bookService.getBooksBySearchQuery(author, title, size, useAnd));
         return "search_page";
     }
 }

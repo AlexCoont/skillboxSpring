@@ -15,6 +15,6 @@ public interface ProjectRepository<T> {
 
     void removeItemsBySize(Integer size);
 
-    List<T> getAllBySearchQuery(String author, String title, Integer size, String AO);
+    List<T> getAllBySearchQuery(String author, String title, Integer size, Boolean useAnd);
 
 }

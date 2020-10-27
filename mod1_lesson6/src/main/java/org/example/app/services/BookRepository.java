@@ -8,6 +8,8 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Repository
 public class BookRepository implements ProjectRepository<Book> {
 
@@ -68,33 +70,21 @@ public class BookRepository implements ProjectRepository<Book> {
     }
 
     @Override
-    public List<Book> getAllBySearchQuery(String author, String title, Integer size, String AO) {
-        List<Book> searchBooks = new ArrayList<>();
-        if ("on".equals(AO)){
-            for (Book book : retreiveAll()) {
-                if (!StringUtils.isEmpty(author) && !StringUtils.isEmpty(title) && null != size) {
-                    if (author.equals(book.getAuthor())
-                            && title.equals(book.getTitle())
-                            && size.equals(book.getSize())) {
-                        searchBooks.add(book);
-                    }
-                }
-            }
-            return searchBooks;
+    public List<Book> getAllBySearchQuery(String author, String title, Integer size, Boolean useAnd) {
+        if (useAnd){
+            return retreiveAll().stream().filter(book -> !StringUtils.isEmpty(author) && author.equals(book.getAuthor()))
+                .filter(book -> !StringUtils.isEmpty(title) && title.equals(book.getTitle()))
+                .filter(book -> size != null && size.equals(book.getSize()))
+                .collect(toList());
         }
-        for (Book book : retreiveAll()){
+        return getAllWithOr(author, title, size);
+    }
 
-            if (!StringUtils.isEmpty(author) && author.equals(book.getAuthor())){
-                searchBooks.add(book);
-            }
-            if (!StringUtils.isEmpty(title) && author.equals(book.getTitle())){
-                searchBooks.add(book);
-            }
-            if (null != size && size.equals(book.getSize())){
-                searchBooks.add(book);
-            }
+    private List<Book> getAllWithOr(String author, String title, Integer size){
 
-        }
-        return searchBooks;
+        return retreiveAll().stream().filter(book -> !StringUtils.isEmpty(author) && author.equals(book.getAuthor()) ||
+                !StringUtils.isEmpty(title) && title.equals(book.getTitle()) ||
+                null != size && size.equals(book.getSize())).collect(toList());
+
     }
 }

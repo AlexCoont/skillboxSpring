@@ -4,7 +4,6 @@ import org.example.web.dto.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,7 +40,8 @@ public class BookService {
         bookRepo.removeItemsBySize(size);
     }
 
-    public List<Book> getBooksBySearchQuery(String author, String title, Integer size, String AO){
-        return bookRepo.getAllBySearchQuery(author, title, size, AO);
+    public List<Book> getBooksBySearchQuery(String author, String title, Integer size, Boolean useAnd){
+
+        return bookRepo.getAllBySearchQuery(author, title, size, useAnd);
     }
 }
