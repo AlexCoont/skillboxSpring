@@ -2,6 +2,9 @@ package org.example.app.services;
 
 import org.apache.log4j.Logger;
 import org.example.web.dto.Book;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -11,10 +14,11 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Repository
-public class BookRepository implements ProjectRepository<Book> {
+public class BookRepository implements ProjectRepository<Book>, ApplicationContextAware {
 
     private final Logger logger = Logger.getLogger(BookRepository.class);
     private final List<Book> repo = new ArrayList<>();
+    private ApplicationContext context;
 
     @Override
     public List<Book> retreiveAll() {
@@ -23,13 +27,13 @@ public class BookRepository implements ProjectRepository<Book> {
 
     @Override
     public void store(Book book) {
-        book.setId(book.hashCode());
+        book.setId(context.getBean(IdProvider.class).provideId(book));
         logger.info("store new book: " + book);
         repo.add(book);
     }
 
     @Override
-    public boolean removeItemById(Integer bookIdToRemove) {
+    public boolean removeItemById(String bookIdToRemove) {
         for (Book book : retreiveAll()) {
             if (bookIdToRemove.equals(book.getId())) {
                 logger.info("remove book by id completed: " + book);
@@ -86,5 +90,10 @@ public class BookRepository implements ProjectRepository<Book> {
                 !StringUtils.isEmpty(title) && title.equals(book.getTitle()) ||
                 null != size && size.equals(book.getSize())).collect(toList());
 
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 }
